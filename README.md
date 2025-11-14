@@ -191,7 +191,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Author
 
-**Mrinal Verma**
+**dartzfork**
 
 Updated with CustomTkinter for modern UI/UX.
 
