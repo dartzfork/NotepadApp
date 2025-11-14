@@ -11,6 +11,7 @@ A modern, feature-rich notepad application built with Python and CustomTkinter. 
 - **Modern UI**: Clean and intuitive interface built with CustomTkinter
 - **Theme Support**: Automatic system theme detection (Light/Dark mode)
 - **File Operations**: Create, open, and save text files
+- **Large File Warning**: Automatic file size detection with user confirmation for files >= 5 MB to prevent performance issues
 - **Text Editing**: Standard cut, copy, and paste functionality
 - **Cross-platform**: Works on Windows, macOS, and Linux
 - **Customizable Window**: Adjustable window size with centered display
@@ -91,7 +92,11 @@ python3 Notepad.py
 #### Opening an Existing File
 1. Click the **Open** button
 2. Select a file from the file dialog
-3. The file content will be displayed in the text area
+3. For files 5 MB or larger, a warning dialog will appear showing the file size and asking for confirmation
+4. Choose **Yes** to proceed with loading the file, or **No** to cancel
+5. The file content will be displayed in the text area
+
+**Note**: The application checks file size before opening to protect against performance issues with large files. Files smaller than 5 MB open immediately without any warning.
 
 #### Saving a File
 1. Click the **Save** button
@@ -155,6 +160,7 @@ NotepadApp is built using object-oriented programming principles:
 2. **Scrollbar**: CTkScrollbar for navigating long documents
 3. **Command Bar**: CTkFrame containing CTkButton widgets for all operations
 4. **File Management**: Built-in file operations using Python's standard library
+5. **Large File Protection**: Automatic file size detection (>= 5 MB threshold) with user confirmation dialogs to prevent performance degradation when opening very large files
 
 ## Troubleshooting
 
@@ -172,6 +178,12 @@ NotepadApp is built using object-oriented programming principles:
 
 - **Issue**: File open/save dialogs don't show
 - **Solution**: Ensure your Python installation includes tkinter (usually included by default)
+
+### Large File Warning
+
+- **Issue**: Warning dialog appears when opening files
+- **Explanation**: This is a protective feature that activates for files 5 MB or larger to prevent performance issues
+- **Solution**: Click **Yes** to proceed if you want to open the large file, or **No** to cancel. Consider using a specialized editor for very large files (>50 MB)
 
 ## Contributing
 
@@ -226,6 +238,7 @@ Potential future enhancements:
 - **v1.0.0** (Current): Initial release with core functionality
   - Basic text editing
   - File operations (New, Open, Save)
+  - Large file warning system (>= 5 MB threshold)
   - Cut, copy, paste operations
   - Modern CustomTkinter interface
 
