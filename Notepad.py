@@ -7,6 +7,7 @@ a modern, user-friendly interface that adapts to system themes.
 
 Features:
     - Create, open, and save text files
+    - Large file warning with user confirmation for files >= 5 MB
     - Cut, copy, and paste text
     - Modern CustomTkinter interface with theme support
     - Cross-platform compatibility (Windows, macOS, Linux)
@@ -186,41 +187,120 @@ class Notepad:
         self.root.title("Untitled - Notepad")
         self.file = None
     
+    def _format_file_size(self, size_bytes):
+        """
+        Format file size in human-readable format.
+
+        Converts byte size to the most appropriate unit (B, KB, MB, GB) with
+        two decimal places for clarity.
+
+        Args:
+            size_bytes (int): File size in bytes
+
+        Returns:
+            str: Formatted file size string (e.g., "1.50 MB", "500 B")
+
+        Example:
+            >>> self._format_file_size(1024)
+            '1.00 KB'
+            >>> self._format_file_size(1536000)
+            '1.46 MB'
+        """
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size_bytes < 1024.0:
+                return f"{size_bytes:.2f} {unit}"
+            size_bytes /= 1024.0
+        return f"{size_bytes:.2f} TB"
+
     def open_file(self):
         """
-        Open an existing file.
-        
-        Displays a file dialog allowing the user to select a file to open. The
-        file's contents are read and displayed in the text area. The window title
-        is updated to show the filename.
-        
+        Open an existing file with large file warning.
+
+        Displays a file dialog allowing the user to select a file to open. For
+        files larger than 5 MB, displays a warning dialog with the file size and
+        asks for user confirmation before proceeding. This prevents performance
+        issues when opening very large files.
+
+        The file size check is performed before reading the file contents, ensuring
+        efficient operation without loading unnecessary data into memory.
+
         Supported file types:
             - All files (*.*)
             - Text documents (*.txt)
-        
+
+        Large File Handling:
+            - Files >= 5 MB trigger a confirmation dialog
+            - Dialog displays file name and size in human-readable format
+            - User can choose to proceed (Yes) or cancel (No)
+            - Small files open seamlessly without any warning
+
         Error Handling:
-            Displays an error dialog if the file cannot be opened (e.g., due to
-            permissions or if the file doesn't exist).
+            - File not found or deleted after selection
+            - Permission denied errors
+            - File size check failures
+            - File read errors
+            All errors display user-friendly dialogs with specific error messages.
         """
         filename = filedialog.askopenfilename(
             defaultextension=".txt",
             filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")]
         )
-        
+
         if filename:
             try:
+                # Check file size before attempting to read
+                # This prevents loading large files into memory unnecessarily
+                file_size = os.path.getsize(filename)
+
+                # Define threshold for large files (5 MB = 5 * 1024 * 1024 bytes)
+                LARGE_FILE_THRESHOLD = 5 * 1024 * 1024
+
+                # If file is large, ask for user confirmation
+                if file_size >= LARGE_FILE_THRESHOLD:
+                    formatted_size = self._format_file_size(file_size)
+                    file_basename = os.path.basename(filename)
+
+                    # Display warning dialog with Yes/No choice
+                    user_choice = messagebox.askyesno(
+                        "Large File Warning",
+                        f"The file '{file_basename}' is large ({formatted_size}).\n\n"
+                        f"Opening large files may take time and could impact performance.\n\n"
+                        f"Do you want to continue loading this file?",
+                        icon='warning'
+                    )
+
+                    # If user chooses No, cancel the operation
+                    if not user_choice:
+                        return
+
                 # Read file contents
                 with open(filename, "r") as file:
                     content = file.read()
-                
+
                 # Display content in text area
                 self.text_area.delete("1.0", "end")
                 self.text_area.insert("1.0", content)
-                
+
                 # Update window title and track file path
                 self.root.title(f"{os.path.basename(filename)} - Notepad")
                 self.file = filename
-                
+
+            except FileNotFoundError:
+                messagebox.showerror(
+                    "File Not Found",
+                    f"The file '{os.path.basename(filename)}' could not be found.\n"
+                    f"It may have been moved or deleted."
+                )
+            except PermissionError:
+                messagebox.showerror(
+                    "Permission Denied",
+                    f"You don't have permission to read the file:\n{os.path.basename(filename)}"
+                )
+            except OSError as e:
+                messagebox.showerror(
+                    "File Size Check Error",
+                    f"Unable to check file size:\n{e}"
+                )
             except Exception as e:
                 messagebox.showerror("Open File", f"Failed to open file:\n{e}")
     
