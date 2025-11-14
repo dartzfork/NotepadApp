@@ -1,0 +1,6 @@
+# NotepadApp Dependencies
+# Install all dependencies with: pip install -r requirements.txt
+
+# CustomTkinter - Modern and customizable Python UI-library based on Tkinter
+# Provides modern widgets with theme support and cross-platform compatibility
+customtkinter>=5.2.0
