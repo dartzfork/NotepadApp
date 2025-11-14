@@ -39,7 +39,7 @@ Before contributing, ensure you have:
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/NotepadApp.git
+   git clone https://github.com/dartzfork/NotepadApp.git
    cd NotepadApp
    ```
 3. Add the upstream repository:
